@@ -1,0 +1,15 @@
+CHANGES
+=======
+
+* Better CLI structure
+* Add support to copy a page
+* * Basic formatting cleanup * Added init-main convention
+* Specify the optional label argument by name when instantiating ConfluencePage
+* Add some debug logging to confluence.py
+* Add --delimiter option for 'listpages' and 'getpagesummary'
+* Update README.md
+* New command 'getpagesummary'
+* New command 'listpages' to list the pages in one or all spaces
+* fix: filename variable didnt exist
+* Refactored argument parsing, better object names and added getallpages and getallusers
+* Copy from private repo
