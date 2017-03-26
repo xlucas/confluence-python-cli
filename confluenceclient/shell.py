@@ -16,6 +16,7 @@
 import confluenceclient
 import sys
 
+from confluenceclient.plugins.manager import PluginManager
 from cliff.app import App
 from cliff.commandmanager import CommandManager
 
@@ -24,15 +25,14 @@ class ConfluenceClient(App):
     """Confluence Command-line Client."""
 
     def __init__(self):
+        self.plugin_manager = PluginManager('confluence.cli.plugins')
+
         super(ConfluenceClient, self).__init__(
             description=self.__doc__,
             version=confluenceclient.__version__,
             command_manager=CommandManager('confluence.cli'),
             deferred_help=True
         )
-
-    def initialize_app(self, argv):
-        pass
 
     def build_option_parser(self, description, version):
         parser = super(ConfluenceClient, self).build_option_parser(
@@ -45,25 +45,22 @@ class ConfluenceClient(App):
             metavar="<server>",
             help="Server name",
         )
-        parser.add_argument(
-            "-u",
-            "--username",
-            metavar="<username>",
-            help="User name",
-        )
-        parser.add_argument(
-            "-p",
-            "--password",
-            metavar="<password>",
-            help="User password",
-        )
-        parser.add_argument(
-            "-k",
-            "--keyring",
-            help="Use keyring",
-            action='store_true',
-        )
+
+        self.plugin_manager.build_option_parser(parser)
+
         return parser
+
+    def clean_up(self, cmd, result, error):
+        for plugin in self.plugin_manager.active_plugins(self.options):
+            getattr(plugin, 'after_command')(self, cmd, result, error)
+
+    def initialize_app(self, argv):
+        for plugin in self.plugin_manager.active_plugins(self.options):
+            getattr(plugin, 'initialize')(self)
+
+    def prepare_to_run_command(self, cmd):
+        for plugin in self.plugin_manager.active_plugins(self.options):
+            getattr(plugin, 'before_command')(self, cmd)
 
 
 def main(argv=sys.argv[1:]):
