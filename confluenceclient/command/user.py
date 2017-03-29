@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from cliff.command import Command
+from cliff.lister import Lister
+from cliff.show import ShowOne
+from confluenceclient import formatter
 
 
 class UserCommand(Command):
@@ -31,15 +34,15 @@ class Add(UserCommand):
     def get_parser(self, prog_name):
         parser = super(Add, self).get_parser(prog_name)
         parser.add_argument(
-            "--fullname",
-            metavar="<fullname>",
-            help="New user full name",
-            required=True,
-        )
-        parser.add_argument(
             "--email",
             metavar="<email>",
             help="New user email address",
+            required=True,
+        )
+        parser.add_argument(
+            "--fullname",
+            metavar="<fullname>",
+            help="New user full name",
             required=True,
         )
         parser.add_argument(
@@ -51,32 +54,37 @@ class Add(UserCommand):
         return parser
 
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.user.create(
+            parsed_args.name,
+            parsed_args.fullname,
+            parsed_args.email,
+            parsed_args.password,
+        )
 
 
 class Deactivate(UserCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.user.deactivate(parsed_args.name)
 
 
-class Info(UserCommand):
+class Info(UserCommand, ShowOne):
     def take_action(self, parsed_args):
-        pass
+        return formatter.entry(self.app.proxy.user.get(parsed_args.name))
 
 
-class List(Command):
+class List(Lister):
     def take_action(self, parsed_args):
-        pass
+        return formatter.table(self.app.proxy.user.list_())
 
 
 class Reactivate(UserCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.user.reactivate(parsed_args.name)
 
 
 class Remove(UserCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.user.delete(parsed_args.name)
 
 
 class Update(UserCommand):
@@ -91,4 +99,4 @@ class Update(UserCommand):
         return parser
 
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.user.update(parsed_args.name, parsed_args.password)
