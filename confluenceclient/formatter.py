@@ -18,3 +18,9 @@ def table(json):
     headers = [name.capitalize() for name in sorted(json[0].keys())]
     rows = [entry.values() for entry in json]
     return (headers, rows)
+
+
+def entry(json):
+    headers = [name.capitalize() for name in json]
+    rows = [json[key] for key in json]
+    return (sorted(headers), sorted(rows))
