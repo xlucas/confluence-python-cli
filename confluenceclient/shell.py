@@ -17,6 +17,7 @@ import confluenceclient
 import sys
 
 from confluenceclient.plugins.manager import PluginManager
+from confluenceclient.api.proxy import Proxy
 from cliff.app import App
 from cliff.commandmanager import CommandManager
 
@@ -40,10 +41,10 @@ class ConfluenceClient(App):
             version,
         )
         parser.add_argument(
-            "-s",
-            "--server",
-            metavar="<server>",
-            help="Server name",
+            "-u",
+            "--url",
+            metavar="<url>",
+            help="URL of the API",
         )
 
         self.plugin_manager.build_option_parser(parser)
@@ -57,6 +58,10 @@ class ConfluenceClient(App):
     def initialize_app(self, argv):
         for plugin in self.plugin_manager.active_plugins(self.options):
             getattr(plugin, 'initialize')(self)
+
+        # Authenticate
+        self.proxy = Proxy(self.options.url)
+        self.proxy.token = self.proxy.auth.login(self.username, self.password)
 
     def prepare_to_run_command(self, cmd):
         for plugin in self.plugin_manager.active_plugins(self.options):

@@ -32,11 +32,11 @@ def after_command(app, cmd, result, error):
 
 
 def before_command(app, cmd):
-    _load_credentials(app, app.options)
+    pass
 
 
 def initialize(app):
-    pass
+    _load_credentials(app, app.options)
 
 
 def _load_credentials(app, options):
