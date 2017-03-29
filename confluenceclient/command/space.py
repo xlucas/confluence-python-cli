@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from cliff.command import Command
+from cliff.lister import Lister
+from confluenceclient import formatter
 
 
 class SpaceCommand(Command):
@@ -28,15 +30,23 @@ class SpaceCommand(Command):
 
 
 class Add(SpaceCommand):
+    def get_parser(self, prog_name):
+        parser = super(Add, self).get_parser(prog_name)
+        parser.add_argument(
+            "name",
+            metavar="<name>",
+            help="Space name",
+        )
+
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.space.create(parsed_args.space, parsed_args.name)
 
 
-class List(Command):
+class List(Lister):
     def take_action(self, parsed_args):
-        pass
+        return formatter.table(self.app.proxy.space.list_())
 
 
 class Remove(SpaceCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.space.delete(parsed_args.space)
