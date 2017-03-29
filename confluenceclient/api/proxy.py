@@ -19,20 +19,21 @@ import xmlrpclib
 from confluenceclient.api import exceptions as ex
 
 
-class Client:
-    def __init__(self, host, use_tls=False):
+class Proxy:
+    def __init__(self, url):
         self.clients = {}
         self._imports = {}
 
         try:
-            scheme = 'https' if use_tls else 'http'
-            url = "%s://%s/rpc/xmlrpc" % (scheme, host)
-            self.soap_client = xmlrpclib.Server(url)
+            soap_url = "%s/rpc/xmlrpc" % url
+            self.soap_client = xmlrpclib.Server(soap_url)
+            self.token = None
         except xmlrpclib.Fault, e:
             raise ex.RPCException(e)
 
     def __getattr__(self, name):
-        modname = "%s.%s.client" % (self.__module__, name)
+        suffix_len = len(self.__class__.__name__.lower())
+        modname = "%s.%s.client" % (self.__module__[:-(suffix_len + 1)], name)
 
         if name not in self.clients:
             __import__(modname)
@@ -42,3 +43,5 @@ class Client:
                 self.token,
             )
             self.clients[name] = client
+
+        return self.clients[name]
