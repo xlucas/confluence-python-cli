@@ -56,6 +56,9 @@ class ConfluenceClient(App):
             getattr(plugin, 'after_command')(self, cmd, result, error)
 
     def initialize_app(self, argv):
+        if self.options.deferred_help:
+            return
+
         for plugin in self.plugin_manager.active_plugins(self.options):
             getattr(plugin, 'initialize')(self)
 
