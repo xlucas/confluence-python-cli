@@ -40,7 +40,7 @@ class Client(object):
     def get(self, name):
         return self.soap_client.confluence2.getUser(self.token, name)
 
-    def list(self):
+    def list_(self):
         return self.soap_client.confluence2.getActiveUsers(self.token, True)
 
     def reactivate(self, name):

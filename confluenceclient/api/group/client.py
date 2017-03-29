@@ -26,7 +26,7 @@ class Client(object):
     def delete(self, name, target_name):
         self.soap_client.confluence2.removeGroup(self.token, name, target_name)
 
-    def list(self, user_name=None):
+    def list_(self, user_name=None):
         if user_name:
             return self.soap_client.confluence2.getUserGroups(
                 self.token,

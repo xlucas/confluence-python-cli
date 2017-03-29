@@ -27,11 +27,11 @@ class Client(object):
             name,
         )
 
-    def list(self, space_key):
+    def list_(self, space_key):
         return self.soap_client.confluence2.getPages(self.token, space_key)
 
-    def remove(self, _id):
-        self.soap_client.confluence2.removePage(self.token, _id)
+    def remove(self, id_):
+        self.soap_client.confluence2.removePage(self.token, id_)
 
     def render(self, space_key, page_id, page_content, style):
         return self.soap_client.confluence2.renderContent(
@@ -42,12 +42,12 @@ class Client(object):
             {'style': style},
         )
 
-    def add_label(self, label, page_id):
-        self.soap_client.confluence2.addLabelByName(self.token, label, page_id)
+    def add_label(self, label, id_):
+        self.soap_client.confluence2.addLabelByName(self.token, label, id_)
 
-    def delete_label(self, label, page_id):
+    def delete_label(self, label, id_):
         self.soap_client.confluence2.removeLabelByName(
             self.token,
             label,
-            page_id,
+            id_,
         )

@@ -34,5 +34,5 @@ class Client(object):
     def get(self, key):
         return self.soap_client.confluence2.getSpace(self.token, key)
 
-    def list(self):
+    def list_(self):
         return self.soap_client.confluence2.getSpaces(self.token)
