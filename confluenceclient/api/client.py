@@ -19,7 +19,7 @@ import xmlrpclib
 from confluenceclient.api import exceptions as ex
 
 
-class Client:
+class Client(object):
     def __init__(self, host, use_tls=False):
         self.clients = {}
         self._imports = {}

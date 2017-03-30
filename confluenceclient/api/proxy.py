@@ -19,7 +19,7 @@ import xmlrpclib
 from confluenceclient.api import exceptions as ex
 
 
-class Proxy:
+class Proxy(object):
     def __init__(self, url):
         self.clients = {}
         self._imports = {}
