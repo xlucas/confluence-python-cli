@@ -22,12 +22,23 @@ def build_option_parser(parser):
         metavar="<file>",
         help="Output PDF file",
     )
+    parser.add_argument(
+        "--pdf-option",
+        metavar="<key=value>",
+        type=str,
+        nargs='+',
+        help="wkhtmltopdf render option",
+    )
 
 
 def after_command(app, cmd, result, error):
     if cmd.cmd_name == 'page render' and not error:
+        options = {}
+        for option in app.options.pdf_option:
+            kv = option.split('=')
+            options[kv[0]] = kv[1]
         html = result.encode('ascii', 'xmlcharrefreplace')
-        pdfkit.from_string(html, app.options.pdf_file)
+        pdfkit.from_string(html, app.options.pdf_file, options)
 
 
 def before_command(app, cmd):
