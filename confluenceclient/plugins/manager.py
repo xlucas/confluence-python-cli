@@ -60,7 +60,7 @@ class PluginManager(object):
     def _build_plugin_group_options(self, group, parser):
         for plugin in self.plugins[group]:
             arg_group = parser.add_argument_group(
-                "plugin.%s.%s" % (group, plugin.name)
+                "%s %s plugin" % (plugin.name.capitalize(), group)
             )
             getattr(plugin, 'build_option_parser')(arg_group)
 
@@ -71,6 +71,6 @@ class PluginManager(object):
         for plugin in self.plugins[group]:
             parser.add_argument(
                 "--plugin.%s.%s" % (group, plugin.name),
-                help="Enable %s plugin for %s." % (plugin.name, group),
+                help="Enable %s %s plugin." % (plugin.name, group),
                 action="store_true",
             )
