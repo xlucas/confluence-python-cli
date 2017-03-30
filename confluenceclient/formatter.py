@@ -13,11 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import operator
+
+tuple_key = operator.itemgetter(0)
+tuple_val = operator.itemgetter(1)
+
 
 def entry(json):
-    sorted_kv = sorted(json.items(), key=lambda t: t[0])
-    headers = map(lambda t: t[0].capitalize(), sorted_kv)
-    rows = map(lambda t: t[1], sorted_kv)
+    sorted_kv = sorted(json.items(), key=tuple_key)
+    headers = map(lambda t: tuple_key(t).capitalize(), sorted_kv)
+    rows = map(tuple_val, sorted_kv)
     return (headers, rows)
 
 
@@ -27,9 +32,9 @@ def table(json, sort_field=None):
     if sort_field:
         json = sorted(json, key=lambda t: t[sort_field.lower()].lower())
     for entry in json:
-        sorted_kv = sorted(entry.items(), key=lambda t: t[0])
-        sorted_v = map(lambda t: t[1], sorted_kv)
+        sorted_kv = sorted(entry.items(), key=tuple_key)
+        sorted_v = map(tuple_val, sorted_kv)
         rows.append(sorted_v)
         if not headers:
-            headers = map(lambda t: t[0].capitalize(), sorted_kv)
+            headers = map(lambda t: tuple_key(t).capitalize(), sorted_kv)
     return (headers, rows)
