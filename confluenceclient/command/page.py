@@ -13,7 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
+from confluenceclient import formatter
+from confluenceclient.command.common.lister import OrderedLister
 from cliff.command import Command
+from cliff.show import ShowOne
 
 
 class PageCommand(Command):
@@ -33,6 +38,18 @@ class PageCommand(Command):
         return parser
 
 
+class PageLabelCommand(Command):
+    def get_parser(self, prog_name):
+        parser = super(PageCommand, self).get_parser(prog_name)
+        parser.add_argument(
+            "--label",
+            metavar="<name>",
+            help="Label name",
+            required=True,
+        )
+        return parser
+
+
 class PageMetaCommand(Command):
     def get_parser(self, prog_name):
         parser = super(PageMetaCommand, self).get_parser(prog_name)
@@ -40,7 +57,7 @@ class PageMetaCommand(Command):
             "--label",
             metavar="<label>",
             help="Page label",
-            default="created_via_api",
+            default="generated_with_api",
         )
         return parser
 
@@ -50,7 +67,7 @@ class PageSourceCommand(Command):
         parser = super(PageSourceCommand, self).get_parser(prog_name)
         source = parser.add_mutually_exclusive_group()
         source.add_argument(
-            "--file",
+            "--in-file",
             metavar="<file>",
             help="File to read content from",
         )
@@ -60,6 +77,12 @@ class PageSourceCommand(Command):
             action='store_true',
         )
         return parser
+
+    def read_source(self, parsed_args):
+        if parsed_args.file:
+            return open(parsed_args.in_file, 'rb').read()
+        if parsed_args.stdin:
+            return sys.stdin.read()
 
 
 class PageTreeCommand(Command):
@@ -76,12 +99,18 @@ class PageTreeCommand(Command):
 
 class Add(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.page.store(
+            parsed_args.space,
+            parsed_args.parent,
+            parsed_args.name,
+            self.read_source(parsed_args),
+        )
 
 
 class Content(PageCommand):
     def take_action(self, parsed_args):
-        pass
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        return page['content']
 
 
 class Copy(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
@@ -96,39 +125,70 @@ class Copy(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
         return parser
 
     def take_action(self, parsed_args):
-        pass
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.origin)
+        self.app.proxy.page.create(
+            page['space'],
+            page['parentId'],
+            parsed_args.name,
+            page['content'],
+        )
 
 
-class Crawl(Command):
+class Info(PageCommand, ShowOne):
     def take_action(self, parsed_args):
-        pass
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        del (page['content'])
+        return formatter.entry(page)
 
 
-class List(Command):
-    def take_action(self, parsed_args):
-        pass
-
-
-class Remove(PageCommand):
-    def take_action(self, parsed_args):
-        pass
-
-
-class Summary(PageCommand):
+class List(OrderedLister):
     def get_parser(self, prog_name):
-        parser = super(Summary, self).get_parser(prog_name)
+        parser = super(List, self).get_parser(prog_name)
         parser.add_argument(
-            "--delimiter",
-            metavar="<delimiter>",
-            help="Field delimiter",
-            default=", ",
+            "--space",
+            metavar="<key>",
+            help="Space key",
+            required=True,
         )
         return parser
 
     def take_action(self, parsed_args):
-        pass
+        return formatter.table(
+            self.app.proxy.page.list_(parsed_args.space),
+            parsed_args.order_by,
+        )
+
+
+class Remove(PageCommand):
+    def take_action(self, parsed_args):
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        self.app.proxy.page.remove(page['id'])
+
+
+class Render(PageCommand):
+    def take_action(self, parsed_args):
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        return self.app.proxy.page.render(page['id'])
 
 
 class Update(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
     def take_action(self, parsed_args):
-        pass
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        self.app.proxy.page.store(
+            page['space'],
+            page['parentId'],
+            page['title'],
+            self.read_source(parsed_args),
+        )
+
+
+class LabelAdd(PageCommand, PageLabelCommand):
+    def take_action(self, parsed_args):
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        self.app.proxy.page.add_label(parsed_args.label, page['id'])
+
+
+class LabelRemove(PageCommand, PageLabelCommand):
+    def take_action(self, parsed_args):
+        page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
+        self.app.proxy.page.delete_label(parsed_args.label, page['id'])

@@ -33,13 +33,14 @@ class Client(object):
     def remove(self, id_):
         self.soap_client.confluence2.removePage(self.token, id_)
 
-    def render(self, space_key, page_id, page_content, style):
-        return self.soap_client.confluence2.renderContent(
-            self.token,
-            space_key,
-            page_id,
-            page_content,
-            {'style': style},
+    def store(self, space_key, parent_id, name, content):
+        self.soap_client.confluence2.storePage(
+            self.token, {
+                'title': name,
+                'content': content,
+                'space': space_key,
+                'parentId': parent_id,
+            }
         )
 
     def add_label(self, label, id_):
