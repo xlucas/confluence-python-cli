@@ -33,6 +33,14 @@ class Client(object):
     def remove(self, id_):
         self.soap_client.confluence2.removePage(self.token, id_)
 
+    def render(self, id_):
+        return self.soap_client.confluence2.renderContent(
+            self.token,
+            '',
+            id_,
+            '',
+        )
+
     def store(self, space_key, parent_id, name, content):
         self.soap_client.confluence2.storePage(
             self.token, {
