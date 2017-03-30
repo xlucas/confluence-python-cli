@@ -14,13 +14,22 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def table(json):
-    headers = [name.capitalize() for name in sorted(json[0].keys())]
-    rows = [entry.values() for entry in json]
+def entry(json):
+    sorted_kv = sorted(json.items(), key=lambda t: t[0])
+    headers = map(lambda t: t[0].capitalize(), sorted_kv)
+    rows = map(lambda t: t[1], sorted_kv)
     return (headers, rows)
 
 
-def entry(json):
-    headers = [name.capitalize() for name in json]
-    rows = [json[key] for key in json]
-    return (sorted(headers), sorted(rows))
+def table(json, sort_field=None):
+    headers = []
+    rows = []
+    if sort_field:
+        json = sorted(json, key=lambda t: t[sort_field.lower()].lower())
+    for entry in json:
+        sorted_kv = sorted(entry.items(), key=lambda t: t[0])
+        sorted_v = map(lambda t: t[1], sorted_kv)
+        rows.append(sorted_v)
+        if not headers:
+            headers = map(lambda t: t[0].capitalize(), sorted_kv)
+    return (headers, rows)
