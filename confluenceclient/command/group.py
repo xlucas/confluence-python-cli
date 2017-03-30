@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from confluenceclient import formatter
 from cliff.command import Command
+from cliff.lister import Lister
 
 
 class GroupCommand(Command):
@@ -40,29 +42,43 @@ class GroupMemberCommand(GroupCommand):
 
 class Add(GroupCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.group.create(parsed_args.name)
 
 
-class List(Command):
+class List(Lister):
+    def get_parser(self, prog_name):
+        parser = super(Lister, self).get_parser(prog_name)
+        parser.add_argument(
+            "--user",
+            metavar="<user>",
+            help="User name",
+        )
+        return parser
+
     def take_action(self, parsed_args):
-        pass
+        return formatter.table(self.app.proxy.group.list_(parsed_args.user))
 
 
 class Remove(GroupCommand):
+    def get_parser(self, prog_name):
+        parser = super(Lister, self).get_parser(prog_name)
+        parser.add_argument(
+            "--dest-group",
+            metavar="<name>",
+            default='confluence-users',
+            help="Group to move users to",
+        )
+        return parser
+
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.group.delete(parsed_args.name, parsed_args.dest_group)
 
 
 class MemberAdd(GroupMemberCommand):
     def take_action(self, parsed_args):
-        pass
-
-
-class MemberList(GroupMemberCommand):
-    def take_action(self, parsed_args):
-        pass
+        self.app.proxy.group.add_member(parsed_args.name, parsed_args.user)
 
 
 class MemberRemove(GroupMemberCommand):
     def take_action(self, parsed_args):
-        pass
+        self.app.proxy.group.remove_member(parsed_args.name, parsed_args.user)
