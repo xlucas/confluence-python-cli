@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from cliff.command import Command
-from cliff.lister import Lister
 from confluenceclient import formatter
+from confluenceclient.command.common.lister import OrderedLister
 
 
 class SpaceCommand(Command):
@@ -42,9 +42,12 @@ class Add(SpaceCommand):
         self.app.proxy.space.create(parsed_args.space, parsed_args.name)
 
 
-class List(Lister):
+class List(OrderedLister):
     def take_action(self, parsed_args):
-        return formatter.table(self.app.proxy.space.list_())
+        return formatter.table(
+            self.app.proxy.space.list_(),
+            parsed_args.order_by,
+        )
 
 
 class Remove(SpaceCommand):
