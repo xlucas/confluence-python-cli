@@ -1,6 +1,27 @@
 CHANGES
 =======
 
+* Remove forked script
+* Update requirements for plugins
+* Enable export plugins
+* Improve space listing
+* Remove abandonned commands
+* Page commands
+* Common commands
+* Fix key and value ordering
+* Group commands
+* Space commands
+* User commands
+* Formatter for unique JSON entries
+* Help priority
+* PDF export plugin
+* JSON to table formatting helper
+* Avoid conflicting names
+* Implement authentication
+* API clients
+* RPC client
+* Credentials plugins
+* Plugin system
 * Better CLI structure
 * Add support to copy a page
 * * Basic formatting cleanup * Added init-main convention
