@@ -23,18 +23,18 @@ def build_option_parser(parser):
         help="Output PDF file",
     )
     parser.add_argument(
-        "--pdf-option",
+        "--pdf-options",
         metavar="<key=value>",
         type=str,
         nargs='+',
-        help="wkhtmltopdf render option",
+        help="wkhtmltopdf render options",
     )
 
 
 def after_command(app, cmd, result, error):
     if cmd.cmd_name == 'page render' and not error:
         options = []
-        for option in app.options.pdf_option:
+        for option in app.options.pdf_options:
             kv_tuple = tuple(option.split('='))
             options.append(kv_tuple)
         html = result.encode('ascii', 'xmlcharrefreplace')
