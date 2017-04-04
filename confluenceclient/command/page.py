@@ -174,11 +174,13 @@ class Render(PageCommand):
 class Update(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
     def take_action(self, parsed_args):
         page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
-        self.app.proxy.page.store(
+        self.app.proxy.page.update(
             page['space'],
+            page['id'],
             page['parentId'],
             page['title'],
             self.read_source(parsed_args),
+            page['version'],
         )
 
 

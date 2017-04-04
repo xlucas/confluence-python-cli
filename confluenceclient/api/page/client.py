@@ -51,6 +51,18 @@ class Client(object):
             }
         )
 
+    def update(self, space_key, id_, parent_id, title, content, version):
+        self.soap_client.confluence2.storePage(
+            self.token, {
+                'id': id_,
+                'content': content,
+                'space': space_key,
+                'title': title,
+                'version': version,
+                'parentId': parent_id,
+            }
+        )
+
     def add_label(self, label, id_):
         self.soap_client.confluence2.addLabelByName(self.token, label, id_)
 
