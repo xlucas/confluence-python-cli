@@ -79,7 +79,7 @@ class PageSourceCommand(Command):
         return parser
 
     def read_source(self, parsed_args):
-        if parsed_args.file:
+        if hasattr(parsed_args, 'file'):
             return open(parsed_args.in_file, 'rb').read()
         if parsed_args.stdin:
             return sys.stdin.read()
@@ -126,7 +126,7 @@ class Copy(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
 
     def take_action(self, parsed_args):
         page = self.app.proxy.page.get(parsed_args.space, parsed_args.origin)
-        self.app.proxy.page.create(
+        self.app.proxy.page.store(
             page['space'],
             page['parentId'],
             parsed_args.name,
