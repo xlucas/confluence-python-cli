@@ -32,7 +32,7 @@ class ConfluenceClient(App):
             description=self.__doc__,
             version=confluenceclient.__version__,
             command_manager=CommandManager('confluence.cli'),
-            deferred_help=True
+            deferred_help=True,
         )
 
     def build_option_parser(self, description, version):
@@ -72,7 +72,13 @@ class ConfluenceClient(App):
 
 
 def main(argv=sys.argv[1:]):
-    return ConfluenceClient().run(argv)
+    result = ConfluenceClient().run(argv)
+    if isinstance(result, unicode):
+        result = result.encode('utf-8')
+    if isinstance(result, str):
+        sys.stdout.write(result)
+    else:
+        return result
 
 
 if __name__ == '__main__':
