@@ -38,8 +38,7 @@ def after_command(app, cmd, result, error):
             for option in app.options.pdf_options:
                 kv_tuple = tuple(option.split('='))
                 options.append(kv_tuple)
-        html = result.encode('ascii', 'xmlcharrefreplace')
-        pdfkit.from_string(html, app.options.pdf_file, dict(options))
+        pdfkit.from_string(result, app.options.pdf_file, dict(options))
 
 
 def before_command(app, cmd):

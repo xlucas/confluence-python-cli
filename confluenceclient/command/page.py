@@ -168,7 +168,8 @@ class Remove(PageCommand):
 class Render(PageCommand):
     def take_action(self, parsed_args):
         page = self.app.proxy.page.get(parsed_args.space, parsed_args.name)
-        return self.app.proxy.page.render(page['id'])
+        html = self.app.proxy.page.render(page['id'])
+        return html.encode('ascii', 'xmlcharrefreplace')
 
 
 class Update(PageCommand, PageMetaCommand, PageSourceCommand, PageTreeCommand):
