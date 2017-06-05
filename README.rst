@@ -57,3 +57,9 @@ It comes with the following plugins:
 +----------+-------------+--------------------------------------------------+
 | PDF      | Export      | Convert rendered HTML page to a PDF file.        |
 +----------+-------------+--------------------------------------------------+
+
+
+Further documentation can be found here_.
+
+
+.. _here: docs/plugins
