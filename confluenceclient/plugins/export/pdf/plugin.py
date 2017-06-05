@@ -34,9 +34,10 @@ def build_option_parser(parser):
 def after_command(app, cmd, result, error):
     if cmd.cmd_name == 'page render' and not error:
         options = []
-        for option in app.options.pdf_options:
-            kv_tuple = tuple(option.split('='))
-            options.append(kv_tuple)
+        if app.options.pdf_options:
+            for option in app.options.pdf_options:
+                kv_tuple = tuple(option.split('='))
+                options.append(kv_tuple)
         html = result.encode('ascii', 'xmlcharrefreplace')
         pdfkit.from_string(html, app.options.pdf_file, dict(options))
 
